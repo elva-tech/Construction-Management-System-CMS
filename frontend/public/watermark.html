@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Watermark Tool</title>
+</head>
+<body>
+  <h2>PDF Watermark Tool</h2>
+  <input type="file" id="pdfInput" accept="application/pdf" />
+  <p>Select a PDF file to add three diagonal 'APPROVED' watermarks to every page.</p>
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <script>
+    const { PDFDocument, rgb, degrees, StandardFonts } = PDFLib;
+
+    async function addApprovedWatermark(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+      for (const page of pdfDoc.getPages()) {
+        const { width, height } = page.getSize();
+        const text = 'APPROVED';
+        const fontSize = Math.max(width, height) / 4; // Larger font size
+        const angle = Math.atan2(height, width) * (180 / Math.PI);
+        const textWidth = font.widthOfTextAtSize(text, fontSize);
+        const textHeight = font.heightAtSize(fontSize);
+
+        // Center the text at each position
+        const positions = [
+          { x: width * 0.25 - textWidth / 2, y: height * 0.25 - textHeight / 2 },
+          { x: width * 0.5 - textWidth / 2, y: height * 0.5 - textHeight / 2 },
+          { x: width * 0.75 - textWidth / 2, y: height * 0.75 - textHeight / 2 },
+        ];
+
+        positions.forEach((pos) => {
+          page.drawText(text, {
+            x: pos.x,
+            y: pos.y,
+            font,
+            size: fontSize,
+            color: rgb(0.1, 0.1, 0.1), // Darker gray
+            rotate: degrees(angle),
+            opacity: 0.45, // More visible
+          });
+        });
+      }
+
+      const modifiedPdfBytes = await pdfDoc.save();
+      return new Blob([modifiedPdfBytes], { type: 'application/pdf' });
+    }
+
+    const input = document.getElementById('pdfInput');
+    input.addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+      const watermarkedPdf = await addApprovedWatermark(file);
+      // Trigger download
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(watermarkedPdf);
+      a.download = 'watermarked.pdf';
+      a.click();
+    });
+  </script>
+</body>
+</html> 
