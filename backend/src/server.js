@@ -3,6 +3,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 require("dotenv").config();
+require("./config/db");
 
 const { tokenMiddleware } = require("./middleware/auth.middleware");
 const authRoutes = require("./routes/auth.routes");
