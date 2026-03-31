@@ -47,24 +47,10 @@ app.options('*', cors(corsOptions));
 
 app.use(tokenMiddleware); // Add the token middleware
 
-// Test route
+
 // Test route
 app.get("/test", (req, res) => {
   res.json({ message: "Test route is working" });
-});
-
-// 👉 ADD HERE (BEFORE middleware)
-app.get("/seed", async (req, res) => {
-  const pool = require("./config/db");
-
-  await pool.execute(`
-    INSERT INTO Client (client_name, project_no, labour_contractor, address, total_budget)
-    VALUES 
-    ('Mr. Rajesh Kumar', '#MC001', 'Suresh Construction', 'Whitefield, Bangalore', '1500000'),
-    ('Mrs. Priya Sharma', '#MC002', 'Ramesh Builders', 'Electronic City, Bangalore', '1800000');
-  `);
-
-  res.send("Seeded");
 });
 
 app.use(tokenMiddleware); // keep this AFTER
