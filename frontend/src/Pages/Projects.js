@@ -22,104 +22,104 @@ const formatINR = (amount) => {
 };
 
 // Mock project data - in a real application, this would come from an API
-const projectsData = [
-  {
-    id: "MC001",
-    name: "Residential Complex",
-    status: "Active",
-    completion: 65,
-    budget: "₹ 15,00,000",
-    budgetValue: 1500000,
-    budgetSpent: 975000,
-    paymentsReceived: 800000,
-    startDate: "01 Jan 2025",
-    endDate: "30 Jun 2025",
-    color: "#4CAF50",
-    description: "Modern 3BHK villa construction with contemporary design",
-    location: "Whitefield, Bangalore",
-    owner: "Sai Elva"
-  },
-  {
-    id: "MC002",
-    name: "Commercial Tower",
-    status: "Active",
-    completion: 40,
-    budget: "₹ 18,00,000",
-    budgetValue: 1800000,
-    budgetSpent: 720000,
-    paymentsReceived: 600000,
-    startDate: "15 Dec 2024",
-    endDate: "15 Aug 2025",
-    color: "#2196F3",
-    description: "2BHK apartment renovation with modern amenities",
-    location: "Electronic City, Bangalore",
-    owner: "Sai Elva"
-  },
-  {
-    id: "MC003",
-    name: "Highway Extension",
-    status: "Active",
-    completion: 25,
-    budget: "₹ 11,25,000",
-    budgetValue: 1125000,
-    budgetSpent: 281250,
-    paymentsReceived: 225000,
-    startDate: "10 Jan 2025",
-    endDate: "10 Oct 2025",
-    color: "#FFC107",
-    description: "3-story commercial complex with retail and office spaces",
-    location: "JP Nagar, Bangalore",
-    owner: "Sai Elva"
-  },
-  {
-    id: "MC004",
-    name: "Hospital Building",
-    status: "Completed",
-    completion: 100,
-    budget: "₹ 17,00,000",
-    budgetValue: 1700000,
-    budgetSpent: 1700000,
-    paymentsReceived: 1700000,
-    startDate: "15 Oct 2024",
-    endDate: "15 Dec 2024",
-    color: "#9C27B0",
-    description: "Industrial warehouse with loading docks and storage facilities",
-    location: "Hosur Road, Bangalore",
-    owner: "Sai Elva"
-  },
-  {
-    id: "MC005",
-    name: "Shopping Mall",
-    status: "Active",
-    completion: 5,
-    budget: "₹ 11,00,000",
-    budgetValue: 1100000,
-    budgetSpent: 55000,
-    paymentsReceived: 44000,
-    startDate: "01 Mar 2025",
-    endDate: "01 Dec 2025",
-    color: "#FF5722",
-    description: "Premium 4BHK bungalow with swimming pool and landscaping",
-    location: "Koramangala, Bangalore",
-    owner: "Sai Elva"
-  },
-  {
-    id: "MC006",
-    name: "IT Park",
-    status: "Active",
-    completion: 0,
-    budget: "₹ 11,50,000",
-    budgetValue: 1150000,
-    budgetSpent: 0,
-    paymentsReceived: 0,
-    startDate: "15 Apr 2025",
-    endDate: "15 Nov 2025",
-    color: "#607D8B",
-    description: "Modern office complex with co-working spaces",
-    location: "Indiranagar, Bangalore",
-    owner: "Sai Elva"
-  }
-];
+// const projectsData = [
+//   {
+//     id: "MC001",
+//     name: "Residential Complex",
+//     status: "Active",
+//     completion: 65,
+//     budget: "₹ 15,00,000",
+//     budgetValue: 1500000,
+//     budgetSpent: 975000,
+//     paymentsReceived: 800000,
+//     startDate: "01 Jan 2025",
+//     endDate: "30 Jun 2025",
+//     color: "#4CAF50",
+//     description: "Modern 3BHK villa construction with contemporary design",
+//     location: "Whitefield, Bangalore",
+//     owner: "Sai Elva"
+//   },
+//   {
+//     id: "MC002",
+//     name: "Commercial Tower",
+//     status: "Active",
+//     completion: 40,
+//     budget: "₹ 18,00,000",
+//     budgetValue: 1800000,
+//     budgetSpent: 720000,
+//     paymentsReceived: 600000,
+//     startDate: "15 Dec 2024",
+//     endDate: "15 Aug 2025",
+//     color: "#2196F3",
+//     description: "2BHK apartment renovation with modern amenities",
+//     location: "Electronic City, Bangalore",
+//     owner: "Sai Elva"
+//   },
+//   {
+//     id: "MC003",
+//     name: "Highway Extension",
+//     status: "Active",
+//     completion: 25,
+//     budget: "₹ 11,25,000",
+//     budgetValue: 1125000,
+//     budgetSpent: 281250,
+//     paymentsReceived: 225000,
+//     startDate: "10 Jan 2025",
+//     endDate: "10 Oct 2025",
+//     color: "#FFC107",
+//     description: "3-story commercial complex with retail and office spaces",
+//     location: "JP Nagar, Bangalore",
+//     owner: "Sai Elva"
+//   },
+//   {
+//     id: "MC004",
+//     name: "Hospital Building",
+//     status: "Completed",
+//     completion: 100,
+//     budget: "₹ 17,00,000",
+//     budgetValue: 1700000,
+//     budgetSpent: 1700000,
+//     paymentsReceived: 1700000,
+//     startDate: "15 Oct 2024",
+//     endDate: "15 Dec 2024",
+//     color: "#9C27B0",
+//     description: "Industrial warehouse with loading docks and storage facilities",
+//     location: "Hosur Road, Bangalore",
+//     owner: "Sai Elva"
+//   },
+//   {
+//     id: "MC005",
+//     name: "Shopping Mall",
+//     status: "Active",
+//     completion: 5,
+//     budget: "₹ 11,00,000",
+//     budgetValue: 1100000,
+//     budgetSpent: 55000,
+//     paymentsReceived: 44000,
+//     startDate: "01 Mar 2025",
+//     endDate: "01 Dec 2025",
+//     color: "#FF5722",
+//     description: "Premium 4BHK bungalow with swimming pool and landscaping",
+//     location: "Koramangala, Bangalore",
+//     owner: "Sai Elva"
+//   },
+//   {
+//     id: "MC006",
+//     name: "IT Park",
+//     status: "Active",
+//     completion: 0,
+//     budget: "₹ 11,50,000",
+//     budgetValue: 1150000,
+//     budgetSpent: 0,
+//     paymentsReceived: 0,
+//     startDate: "15 Apr 2025",
+//     endDate: "15 Nov 2025",
+//     color: "#607D8B",
+//     description: "Modern office complex with co-working spaces",
+//     location: "Indiranagar, Bangalore",
+//     owner: "Sai Elva"
+//   }
+// ];
 
 // Stats Card Component
 const StatsCard = ({ title, value, subtitle, icon: Icon, color, bgGradient }) => (
@@ -324,18 +324,21 @@ const ProjectsPage = () => {
   // Handle project add save
   const handleProjectAdd = async (newProject) => {
     try {
-      const res = await projectService.create({
-        name: newProject.name,
-        address: newProject.location,
-        total_budget: newProject.budgetValue,
-        status: newProject.status ?? 'Active',
-        start_date: newProject.startDate ?? null,
-        end_date: newProject.endDate ?? null,
-        budget_spent: newProject.budgetSpent ?? 0,
-        completion_percentage: newProject.completion ?? 0,
-        created_by: user?.id ?? '',
-        admin_id: user?.id ?? ''
-      });
+      const payload = {
+  name: newProject.name,
+  client_id: 1,   // MUST come from modal
+  address: newProject.location,
+  total_budget: newProject.budgetValue,
+  status: newProject.status ?? 'Active',
+  start_date: newProject.startDate ?? null,
+  end_date: newProject.endDate ?? null,
+  budget_spent: newProject.budgetSpent ?? 0,
+  completion_percentage: newProject.completion ?? 0,
+  created_by: 1,
+  admin_id: 1
+};
+
+const res = await projectService.create(payload);
       // apiService fetch wrapper — res = { success, data: {...} }
       const created = mapApiProject(res?.data ?? newProject, projects.length);
       setProjects(prevProjects => [...prevProjects, created]);
