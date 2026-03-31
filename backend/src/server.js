@@ -47,13 +47,13 @@ app.options('*', cors(corsOptions));
 
 app.use(tokenMiddleware); // Add the token middleware
 
-
+// Test route
 // Test route
 app.get("/test", (req, res) => {
   res.json({ message: "Test route is working" });
 });
 
-// 👉 ADD THIS BELOW
+// 👉 ADD HERE (BEFORE middleware)
 app.get("/seed", async (req, res) => {
   const pool = require("./config/db");
 
@@ -66,6 +66,8 @@ app.get("/seed", async (req, res) => {
 
   res.send("Seeded");
 });
+
+app.use(tokenMiddleware); // keep this AFTER
 
 // Routes
 app.use("/api/v1/auth", authRoutes);
