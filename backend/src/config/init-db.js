@@ -9,10 +9,20 @@ const initializeDatabase = async () => {
         console.log('Starting database initialization...');
 
         // First connect without database
+        // connection = await mysql.createConnection({
+        //     host: process.env.DB_HOST || 'localhost',
+        //     user: process.env.DB_USER || 'root',
+        //     password: process.env.DB_PASSWORD || ''
+        // });
+
         connection = await mysql.createConnection({
-            host: process.env.DB_HOST || 'localhost',
-            user: process.env.DB_USER || 'root',
-            password: process.env.DB_PASSWORD || ''
+            host: process.env.DB_HOST,
+            port: Number(process.env.DB_PORT), // ADDED
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            ssl: {
+                rejectUnauthorized: false // ADDED
+            }
         });
 
         // Create database if it doesn't exist
