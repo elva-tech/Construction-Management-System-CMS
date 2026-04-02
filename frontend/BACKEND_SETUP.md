@@ -269,3 +269,7 @@ CMD ["npm", "start"]
 ## 🎯 **Current Status: Backend Ready!**
 
 Your backend server is fully functional and ready for frontend integration. The authentication system works with both mock data and real JWT tokens, providing a solid foundation for your CMS application.
+
+
+
+docker-compose -f docker-compose.mysql.yml up -d

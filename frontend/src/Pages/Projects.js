@@ -11,6 +11,7 @@ import AddClientModal from '../Pages/Indent'; // or the correct path if AddClien
 import AddUserModal from '../Components/AddUserModal';
 import { ClientProvider, useClientContext } from '../context/ClientContext';
 import projectService from "../services/projectService";
+import apiService from '../services/apiService';
 
 // Utility function to format currency in Indian Rupees
 const formatINR = (amount) => {
@@ -207,6 +208,22 @@ const ProjectsPage = () => {
     fetchProjects();
   }, []);
 
+  useEffect(() => {
+  const fetchClients = async () => {
+    try {
+      const res = await apiService.get('/api/v1/clients/all');
+      const mapped = (res?.data ?? []).map(c => ({
+        id: c.id,
+        name: c.client_name,
+      }));
+      setClientList(mapped);
+    } catch (e) {
+      console.error('[fetchClients] error:', e);
+    }
+  };
+  fetchClients();
+}, []);
+
   // Calculate cumulative stats
   const calculateStats = () => {
     const totalBudget = projects.reduce((sum, project) => sum + project.budgetValue, 0);
@@ -323,31 +340,28 @@ const ProjectsPage = () => {
 
   // Handle project add save
   const handleProjectAdd = async (newProject) => {
-    try {
-      const payload = {
-  name: newProject.name,
-  client_id: 1,   // MUST come from modal
-  address: newProject.location,
-  total_budget: newProject.budgetValue,
-  status: newProject.status ?? 'Active',
-  start_date: newProject.startDate ?? null,
-  end_date: newProject.endDate ?? null,
-  budget_spent: newProject.budgetSpent ?? 0,
-  completion_percentage: newProject.completion ?? 0,
-  created_by: 1,
-  admin_id: 1
+  try {
+    const res = await projectService.create({
+      name: newProject.name,
+      client_id: newProject.client_id,          // ← ADD THIS
+      address: newProject.location,
+      total_budget: newProject.budgetValue,
+      status: newProject.status ?? 'Active',
+      start_date: newProject.startDate ?? null,
+      end_date: newProject.endDate ?? null,
+      budget_spent: newProject.budgetSpent ?? 0,
+      completion_percentage: newProject.completion ?? 0,
+      created_by: user?.id ?? user?.username,   // ← update fallback
+      admin_id: user?.id ?? user?.username,     // ← update fallback
+    });
+    const created = mapApiProject(res?.data ?? newProject, projects.length);
+    setProjects(prevProjects => [...prevProjects, created]);
+    showSuccess(`Project "${newProject.name}" created successfully!`);
+  } catch (e) {
+    console.error("[handleProjectAdd] error:", e);
+    showError('Failed to create project. Please try again.');
+  }
 };
-
-const res = await projectService.create(payload);
-      // apiService fetch wrapper — res = { success, data: {...} }
-      const created = mapApiProject(res?.data ?? newProject, projects.length);
-      setProjects(prevProjects => [...prevProjects, created]);
-      showSuccess(`Project "${newProject.name}" created successfully!`);
-    } catch (e) {
-      console.error("[handleProjectAdd] error:", e);
-      showError('Failed to create project. Please try again.');
-    }
-  };
 
   // Function to get greeting based on time of day
   const getGreeting = () => {
@@ -374,74 +388,65 @@ const res = await projectService.create(payload);
   };
 
   const handleAddUser = async (userData) => {
-    try {
-      // Validate required fields
-      if (!userData.projects || userData.projects.length === 0) {
-        showError('Please select at least one project for the user.');
-        return;
-      }
-
-      // Create user account via backend API
-      console.log('Creating new user:', userData);
-
-      const response = await fetch('/api/v1/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData)
-      });
-
-      const result = await response.json();
-
-      if (!result.success) {
-        showError(result.error || 'Failed to create user');
-        return;
-      }
-
-      console.log('User created successfully:', result.data.user);
-
-      // Store user data in localStorage for immediate UI updates
-      let users = [];
-      try {
-        users = JSON.parse(localStorage.getItem('cms_users')) || [];
-      } catch (e) {
-        users = [];
-      }
-      users.push(result.data.user);
-      localStorage.setItem('cms_users', JSON.stringify(users));
-
-      // If it's a client, also add to client context
-      if (userData.role === 'client') {
-        const newClient = {
-          clientName: userData.name,
-          email: userData.email,
-          phone: userData.phone,
-          projectNo: '',
-          labourContractor: '',
-          address: '',
-          totalBudget: '',
-          projects: userData.projects
-        };
-        addOrUpdateClient(newClient);
-      }
-
-      showSuccess(`${userData.role === 'supervisor' ? 'Supervisor' : 'Client'} "${userData.name}" has been created successfully!`);
-
-      // Log user creation for admin reference
-      console.log('User created:', {
-        name: userData.name,
-        username: userData.username,
-        role: userData.role,
-        projects: userData.projects,
-        loginInstructions: `User can be managed through admin panel. Username: ${userData.username}, Password: ${userData.password}`
-      });
-
-    } catch (error) {
-      console.error('Error creating user:', error);
-      showError('Failed to create user. Please try again.');
+  try {
+    // Validate required fields
+    if (!userData.projects || userData.projects.length === 0) {
+      showError('Please select at least one project for the user.');
+      return;
     }
-  };
+
+    // Create user account via backend API
+    console.log('Creating new user:', userData);
+
+    const result = await apiService.post('/api/v1/users/create', userData);
+    if (!result.success) {
+      showError(result.message || 'Failed to create user');
+      return;
+    }
+
+    console.log('User created successfully:', result.data);
+
+    // Store user data in localStorage for immediate UI updates
+    // let users = [];
+    // try {
+    //   users = JSON.parse(localStorage.getItem('cms_users')) || [];
+    // } catch (e) {
+    //   users = [];
+    // }
+    // users.push(result.data.user);
+    // localStorage.setItem('cms_users', JSON.stringify(users));
+
+    // If it's a client, also add to client context
+    if (userData.role === 'client') {
+      const newClient = {
+        clientName: userData.name,
+        email: userData.email,
+        phone: userData.phone,
+        projectNo: '',
+        labourContractor: '',
+        address: '',
+        totalBudget: '',
+        projects: userData.projects
+      };
+      addOrUpdateClient(newClient);
+    }
+
+    showSuccess(`${userData.role === 'supervisor' ? 'Supervisor' : 'Client'} "${userData.name}" has been created successfully!`);
+
+    // Log user creation for admin reference
+    console.log('User created:', {
+      name: userData.name,
+      username: userData.username,
+      role: userData.role,
+      projects: userData.projects,
+      loginInstructions: `User can be managed through admin panel. Username: ${userData.username}, Password: ${userData.password}`
+    });
+
+  } catch (error) {
+    console.error('Error creating user:', error);
+    showError('Failed to create user. Please try again.');
+  }
+};
 
   return (
     <>
@@ -601,6 +606,7 @@ const res = await projectService.create(payload);
         isOpen={addModalOpen}
         onClose={() => setAddModalOpen(false)}
         onSave={handleProjectAdd}
+        clients={clientList}
       />
 
       <AddClientModal

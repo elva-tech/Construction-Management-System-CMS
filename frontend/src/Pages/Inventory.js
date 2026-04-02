@@ -105,7 +105,7 @@ const Inventory = () => {
         const merged = trackingEntries.map(entry => ({
           ...entry,
           particulars: materialMap?.[entry?.material_id]?.particulars || '',
-          unit: materialMap?.[entry?.material_id]?.unit || entry?.unit || '',
+          unit: materialMap?.[entry?.material_id]?.unit || '',
           received: Number(entry?.received_quantity || 0),
           consumed: Number(entry?.consumed_quantity || 0),
           date: entry?.date ? String(entry.date).split('T')[0] : ''
@@ -172,7 +172,7 @@ const Inventory = () => {
 
     // Find the highest number
     const maxDR = Math.max(0, ...existingDRs);
-
+    
     // Generate next number, zero-padded to 3 digits
     return `DR${(maxDR + 1).toString().padStart(3, '0')}`;
   };
@@ -192,7 +192,7 @@ const Inventory = () => {
   const { transactions, totalAmount, totalPaid, totalBalance, paymentPercentage, balancePercentage } = useMemo(() => {
     const aggregated = appData.dailyReport.entries.reduce((acc, entry) => {
       const key = entry.particulars.toLowerCase();
-
+      
       if (!acc[key]) {
         acc[key] = {
           particulars: entry.particulars,
@@ -202,12 +202,12 @@ const Inventory = () => {
           transactions: []
         };
       }
-
+      
       acc[key].totalAmount += entry.amount;
       acc[key].totalPaid += entry.paid;
       acc[key].totalBalance += entry.balance;
       acc[key].transactions.push(entry);
-
+      
       return acc;
     }, {});
 
@@ -503,7 +503,7 @@ const Inventory = () => {
         acc[key].paid += entry.paid;
         acc[key].balance += entry.balance;
         acc[key].transactions.push(entry);
-
+        
         // Keep track of the latest transaction date and DR number
         const currentDate = new Date(entry.date);
         const existingDate = new Date(acc[key].date);
@@ -516,7 +516,7 @@ const Inventory = () => {
     }, {});
 
     // Convert to array and sort by date (most recent first)
-    return Object.values(grouped).sort((a, b) =>
+    return Object.values(grouped).sort((a, b) => 
       new Date(b.date) - new Date(a.date)
     );
   };
@@ -607,7 +607,7 @@ const Inventory = () => {
       // Validate numeric fields
       const amount = parseFloat(formData.amount);
       const paid = parseFloat(formData.paid) || 0;
-
+      
       if (isNaN(amount) || amount <= 0) {
         showError("Amount must be a positive number");
         return;
@@ -694,19 +694,21 @@ const Inventory = () => {
           <div className="flex flex-wrap space-x-4 sm:space-x-8 overflow-x-auto">
             <button
               onClick={() => setActiveTab("Material Tracking List")}
-              className={`py-2 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${activeTab === "Material Tracking List"
+              className={`py-2 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
+                activeTab === "Material Tracking List"
                   ? "border-[#7BAFD4] text-[#7BAFD4]"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
+              }`}
             >
               Material Tracking List
             </button>
             <button
               onClick={() => setActiveTab("Material Flow")}
-              className={`py-2 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${activeTab === "Material Flow"
+              className={`py-2 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
+                activeTab === "Material Flow"
                   ? "border-[#7BAFD4] text-[#7BAFD4]"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
+              }`}
             >
               Material Flow
             </button>
@@ -769,7 +771,7 @@ const Inventory = () => {
                               key={material.name}
                               className="text-sm text-[#4A5568] hover:bg-gray-50"
                             >
-                              <td className="px-6 py-4">{String(idx + 1).padStart(2, '0')}</td>
+                              <td className="px-6 py-4">{String(idx+1).padStart(2, '0')}</td>
                               <td className="px-6 py-4">
                                 <div
                                   className="cursor-pointer"
@@ -1063,7 +1065,7 @@ const Inventory = () => {
                           className="text-sm hover:bg-gray-50 cursor-pointer"
                           onClick={() => setSelectedTrackingItem(item)}
                         >
-                          <td className="px-6 py-4">{String(idx + 1).padStart(2, '0')}</td>
+                          <td className="px-6 py-4">{String(idx+1).padStart(2, '0')}</td>
                           <td className="px-6 py-4">
                             <span
                               className="text-[#7BAFD4] hover:text-[#6B9FD4] cursor-pointer font-medium"
@@ -1204,32 +1206,32 @@ const Inventory = () => {
                       </div>
                       <div className="overflow-x-auto">
                         <table className="w-full">
-                          <thead className="bg-gray-100">
-                            <tr>
-                              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b">Item No.</th>
-                              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b">DR No.</th>
-                              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b">Item Name</th>
-                              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b">Date</th>
-                              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b">Amount (₹)</th>
-                              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b">Paid (₹)</th>
-                              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b">Pending (₹)</th>
-                              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b">Remarks</th>
+                        <thead className="bg-gray-100">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b">Item No.</th>
+                            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b">DR No.</th>
+                            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b">Item Name</th>
+                            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b">Date</th>
+                            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b">Amount (₹)</th>
+                            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b">Paid (₹)</th>
+                            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b">Pending (₹)</th>
+                            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b">Remarks</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200 bg-white">
+                          {getTransactionsForParticular(selectedTrackingItem.particulars).map((txn, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                              <td className="px-6 py-3 text-sm text-gray-900 border-b border-gray-100">{String(idx + 1).padStart(2, '0')}</td>
+                              <td className="px-6 py-3 text-sm text-gray-900 border-b border-gray-100">{txn.drNo || `DR${String(idx + 1).padStart(3, '0')}`}</td>
+                              <td className="px-6 py-3 text-sm text-gray-900 border-b border-gray-100">{txn.particulars}</td>
+                              <td className="px-6 py-3 text-sm text-gray-900 border-b border-gray-100">{txn.date}</td>
+                              <td className="px-6 py-3 text-sm font-medium text-gray-900 border-b border-gray-100">{formatINR(txn.amount)}</td>
+                              <td className="px-6 py-3 text-sm font-medium text-gray-900 border-b border-gray-100">{formatINR(txn.paid)}</td>
+                              <td className="px-6 py-3 text-sm font-medium text-gray-900 border-b border-gray-100">{formatINR(txn.balance)}</td>
+                              <td className="px-6 py-3 text-sm text-gray-600 border-b border-gray-100">{txn.remarks || 'Received from supplier'}</td>
                             </tr>
-                          </thead>
-                          <tbody className="divide-y divide-gray-200 bg-white">
-                            {getTransactionsForParticular(selectedTrackingItem.particulars).map((txn, idx) => (
-                              <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-6 py-3 text-sm text-gray-900 border-b border-gray-100">{String(idx + 1).padStart(2, '0')}</td>
-                                <td className="px-6 py-3 text-sm text-gray-900 border-b border-gray-100">{txn.drNo || `DR${String(idx + 1).padStart(3, '0')}`}</td>
-                                <td className="px-6 py-3 text-sm text-gray-900 border-b border-gray-100">{txn.particulars}</td>
-                                <td className="px-6 py-3 text-sm text-gray-900 border-b border-gray-100">{txn.date}</td>
-                                <td className="px-6 py-3 text-sm font-medium text-gray-900 border-b border-gray-100">{formatINR(txn.amount)}</td>
-                                <td className="px-6 py-3 text-sm font-medium text-gray-900 border-b border-gray-100">{formatINR(txn.paid)}</td>
-                                <td className="px-6 py-3 text-sm font-medium text-gray-900 border-b border-gray-100">{formatINR(txn.balance)}</td>
-                                <td className="px-6 py-3 text-sm text-gray-600 border-b border-gray-100">{txn.remarks || 'Received from supplier'}</td>
-                              </tr>
-                            ))}
-                          </tbody>
+                          ))}
+                        </tbody>
                         </table>
                       </div>
                     </div>

@@ -3,48 +3,53 @@ const bcrypt = require('bcryptjs');
 
 // Create a new user
 const createUser = async (req, res) => {
-    try {
-        const { id, username, password } = req.body;
+  try {
+    const { id, username, password, role, projects } = req.body;
 
-        // Validate required fields
-        if (!id || !username || !password) {
-            return res.status(400).json({
-                success: false,
-                message: 'Missing required fields: id, username, and password are required'
-            });
-        }
-
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const query = `
-            INSERT INTO User (id, username, password)
-            VALUES (?, ?, ?)
-        `;
-
-        const [result] = await pool.execute(query, [
-            id,
-            username,
-            hashedPassword
-        ]);
-
-        res.status(201).json({
-            success: true,
-            message: 'User created successfully',
-            data: {
-                id,
-                username
-            }
-        });
-
-    } catch (error) {
-        console.error('Error creating user:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error creating user',
-            error: error.message
-        });
+    if (!id || !username || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields: id, username, and password are required'
+      });
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await pool.execute(
+      `INSERT INTO User (id, username, password) VALUES (?, ?, ?)`,
+      [id, username, hashedPassword]
+    );
+
+    // If supervisor, link to projects
+    if (role === 'supervisor' && projects && projects.length > 0) {
+      for (const projectName of projects) {
+        const [projectRows] = await pool.execute(
+          `SELECT id FROM Project WHERE name = ?`,
+          [projectName]
+        );
+        if (projectRows.length > 0) {
+          await pool.execute(
+            `INSERT INTO ProjectSupervisor (project_id, supervisor_id) VALUES (?, ?)`,
+            [projectRows[0].id, id]
+          );
+        }
+      }
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      data: { id, username }
+    });
+
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error creating user',
+      error: error.message
+    });
+  }
 };
 
 // Get all users

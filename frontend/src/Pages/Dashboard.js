@@ -3,6 +3,8 @@ import Navbar from "../Components/Navbar";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useProject } from "../context/ProjectContext";
 import { useAppContext } from "../context/AppContext";
+import materialService from "../services/materialService";
+import materialTrackingService from "../services/materialTrackingService";
 import {
   ChartColumnBig,
   Wallet,
@@ -39,47 +41,86 @@ const Dashboard = () => {
   const { selectedProject, isLoading, selectProject } = useProject();
   const { appData } = useAppContext();
 
-  // Calculate real project statistics from appData
+  // PRODUCTION: real material tracking entries from API
+  const [materialEntries, setMaterialEntries] = useState([]);
+
+  // Fetch material tracking data from API — filtered by project
+  useEffect(() => {
+    const fetchMaterialData = async () => {
+      try {
+        const [materialsRes, trackingRes] = await Promise.all([
+          materialService.getAll(selectedProject?.id),
+          materialTrackingService.getAll(selectedProject?.id)
+        ]);
+
+        const materials = Array.isArray(materialsRes?.data) ? materialsRes.data : [];
+        const trackingEntries = Array.isArray(trackingRes?.data) ? trackingRes.data : [];
+
+        const materialMap = materials.reduce((acc, m) => {
+          if (m?.id !== undefined && m?.id !== null) {
+            acc[m.id] = { particulars: m?.particulars || '', unit: m?.unit || '' };
+          }
+          return acc;
+        }, {});
+
+        const merged = trackingEntries.map(entry => ({
+          ...entry,
+          particulars: materialMap?.[entry?.material_id]?.particulars || '',
+          unit: materialMap?.[entry?.material_id]?.unit || '',
+          received: Number(entry?.received_quantity || 0),
+          consumed: Number(entry?.consumed_quantity || 0),
+          date: entry?.date ? String(entry.date).split('T')[0] : ''
+        }));
+
+        setMaterialEntries(merged);
+      } catch (e) {
+        console.error('[Dashboard] fetchMaterialData error:', e);
+        setMaterialEntries([]);
+      }
+    };
+    fetchMaterialData();
+  }, [selectedProject?.id]);
+
+  // Calculate real project statistics from appData + real materialEntries
   const projectStats = useMemo(() => {
     if (!appData || !appData.dailyReport) return null;
 
     const entries = appData.dailyReport.entries || [];
 
-    // Financial Analysis
+    // Financial Analysis — from DailyReport
     const totalAmount = entries.reduce((sum, entry) => sum + (entry.amount || 0), 0);
     const totalPaid = entries.reduce((sum, entry) => sum + (entry.paid || 0), 0);
     const totalBalance = entries.reduce((sum, entry) => sum + (entry.balance || 0), 0);
     const paymentPercentage = totalAmount > 0 ? Math.round((totalPaid / totalAmount) * 100) : 0;
 
-    // Material Analysis
-    const materials = {};
-    entries.forEach(entry => {
+    // Material Analysis — from REAL MaterialTrackingEntry (not DailyReport)
+    const materialsMap = {};
+    materialEntries.forEach(entry => {
       if (entry.particulars) {
-        if (!materials[entry.particulars]) {
-          materials[entry.particulars] = {
+        if (!materialsMap[entry.particulars]) {
+          materialsMap[entry.particulars] = {
             name: entry.particulars,
             totalReceived: 0,
             totalConsumed: 0,
-            totalAmount: 0,
-            totalPaid: 0,
             unit: entry.unit || 'units'
           };
         }
-        materials[entry.particulars].totalReceived += entry.received || 0;
-        materials[entry.particulars].totalConsumed += entry.consumed || 0;
-        materials[entry.particulars].totalAmount += entry.amount || 0;
-        materials[entry.particulars].totalPaid += entry.paid || 0;
+        materialsMap[entry.particulars].totalReceived += Number(entry.received) || 0;
+        materialsMap[entry.particulars].totalConsumed += Number(entry.consumed) || 0;
+        if (entry.unit && entry.unit !== '') {
+          materialsMap[entry.particulars].unit = entry.unit;
+        }
       }
     });
 
-    const materialList = Object.values(materials);
+    const materialList = Object.values(materialsMap);
     const activeMaterials = materialList.filter(m => m.totalReceived > 0);
     const lowStockMaterials = materialList.filter(m => {
       const remaining = m.totalReceived - m.totalConsumed;
       return remaining > 0 && remaining <= m.totalReceived * 0.2;
     });
 
-    // Monthly Analysis
+    // Monthly Analysis — from DailyReport
     const monthlyData = {};
     entries.forEach(entry => {
       if (entry.date) {
@@ -127,17 +168,16 @@ const Dashboard = () => {
         recent: entries.slice(-5).reverse()
       }
     };
-  }, [appData.dailyReport.entries]);
+  }, [appData.dailyReport.entries, materialEntries]);
 
   // Load project from URL parameter if not already selected
   useEffect(() => {
     if (!isLoading && !selectedProject && !projectId) {
-      // No project selected and no projectId in URL, redirect to projects page
       navigate('/app/projects');
     }
   }, [projectId, selectedProject, isLoading, navigate]);
 
-const renderFinancialChart = () => {
+  const renderFinancialChart = () => {
     if (!projectStats || !projectStats.monthly || projectStats.monthly.length === 0) {
       return <div className="flex items-center justify-center h-40 text-white">No financial data available</div>;
     }
@@ -182,7 +222,7 @@ const renderFinancialChart = () => {
       return <div className="flex items-center justify-center h-40 text-white">No material data available</div>;
     }
 
-    const materials = projectStats.materials.list.slice(0, 6); // Show top 6 materials
+    const materials = projectStats.materials.list.slice(0, 6);
     const maxValue = Math.max(...materials.map(m => Math.max(m.totalReceived, m.totalConsumed)));
 
     return (
@@ -500,10 +540,7 @@ const renderFinancialChart = () => {
                   </div>
                   <div className="text-right">
                     <div className="font-medium text-sm">{formatINR(txn.amount)}</div>
-                    <div className="text-xs text-gray-500">
-                      {txn.received ? `+${txn.received} ${txn.unit}` :
-                       txn.consumed ? `-${txn.consumed} ${txn.unit}` : 'Financial'}
-                    </div>
+                    <div className="text-xs text-gray-500">Financial</div>
                   </div>
                 </div>
               ))}
@@ -529,7 +566,6 @@ const renderFinancialChart = () => {
                 <span className="text-xs">Amount Paid</span>
               </div>
             </div>
-            
             {renderFinancialChart()}
           </div>
 

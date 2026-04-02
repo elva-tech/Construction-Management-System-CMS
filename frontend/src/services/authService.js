@@ -61,13 +61,14 @@ class AuthService {
       const response = await apiService.get('/api/v1/auth/userinfo');
       
       // Store user data in localStorage
-      const userData = {
-        name: response.name || response.preferred_username || 'User',
-        email: response.email || response.preferred_username,
-        username: response.preferred_username,
-        roles: response.roles || [],
-        ...response
-      };
+    const userData = {
+  id: response.sub || response.id,   // ← ADDED
+  name: response.name || response.preferred_username || 'User',
+  email: response.email || response.preferred_username,
+  username: response.preferred_username,
+  roles: response.roles || [],
+  ...response
+};
       
       localStorage.setItem('userData', JSON.stringify(userData));
       return userData;

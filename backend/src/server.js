@@ -3,7 +3,6 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 require("dotenv").config();
-require("./config/db");
 
 const { tokenMiddleware } = require("./middleware/auth.middleware");
 const authRoutes = require("./routes/auth.routes");
@@ -25,24 +24,12 @@ const materialTrackingRoutes = require("./routes/materialTrackingEntry.routes");
 const app = express();
 
 // Configure CORS properly for credentials
-// const corsOptions = {
-//   origin: 'http://localhost:3000', // Specific origin instead of wildcard
-//   credentials: true, // Allow credentials
-//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-//   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-//   optionsSuccessStatus: 200 // For legacy browser support
-// };
-
-
 const corsOptions = {
-  origin: [
-    'http://localhost:3000',
-    'https://construction-management-system-cms-1.onrender.com'
-  ],
-  credentials: true,
+  origin: 'http://localhost:3000', // Specific origin instead of wildcard
+  credentials: true, // Allow credentials
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200 // For legacy browser support
 };
 
 // Middleware
@@ -59,13 +46,10 @@ app.options('*', cors(corsOptions));
 
 app.use(tokenMiddleware); // Add the token middleware
 
-
 // Test route
 app.get("/test", (req, res) => {
   res.json({ message: "Test route is working" });
 });
-
-app.use(tokenMiddleware); // keep this AFTER
 
 // Routes
 app.use("/api/v1/auth", authRoutes);

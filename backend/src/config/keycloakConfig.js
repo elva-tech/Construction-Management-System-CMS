@@ -8,16 +8,22 @@ module.exports = {
     },
   ],
   // Test users for development (bypass Keycloak)
-  TEST_USERS: [
-    {
-      username: "admin",
-      password: "admin123",
-      roles: ["Admin"]
-    },
-    {
-      username: "user", 
-      password: "user123",
-      roles: ["User"]
-    }
-  ]
+ TEST_USERS: [
+  {
+    id: "admin-001",        // ← ADD
+    username: "admin",
+    password: "admin123",
+    email: "admin@elva.com",  // ← ADD
+    name: "Admin",            // ← ADD
+    roles: ["Admin"]
+  },
+  {
+    id: "admin-002",        // ← ADD
+    username: "user",
+    password: "user123",
+    email: "user@elva.com",   // ← ADD
+    name: "User",             // ← ADD
+    roles: ["User"]
+  }
+]
 };

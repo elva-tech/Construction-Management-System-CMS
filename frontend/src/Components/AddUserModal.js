@@ -63,22 +63,22 @@ const AddUserModal = ({ isOpen, onClose, onAdd, projects = [] }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validate()) {
-      // Prepare user data for backend
-      const userData = {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        username: formData.username,
-        password: formData.password,
-        role: formData.authorisation.toLowerCase(),
-        projects: formData.projects,
-        status: 'active'
-      };
-
-      onAdd(userData);
+ const handleSubmit = (e) => {
+  e.preventDefault();
+  if (validate()) {
+    const userData = {
+      id: `${formData.authorisation.toLowerCase()}-${Date.now()}`, // ← ADDED: generates e.g. "supervisor-1712345678"
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      username: formData.username,
+      password: formData.password,
+      role: formData.authorisation.toLowerCase(),
+      projects: formData.projects,
+      status: 'active'
+    };
+    onAdd(userData);
+    // ... rest unchanged
 
       // Store user-project mapping in localStorage for immediate UI updates
       if (formData.authorisation === 'Supervisor') {
