@@ -19,59 +19,57 @@ export const AuthProvider = ({ children }) => {
   // Get Keycloak context (will be null if not wrapped in KeycloakProvider)
   // FIX: Moved useKeycloak() out of try/catch to satisfy React Hook rules
   const keycloakContext = useKeycloak();
+useEffect(() => {
+  const checkAuth = async () => {
+    try {
+      if (keycloakContext && keycloakContext.isLoading) {
+        return; // Wait for Keycloak to finish loading
+      }
 
-  useEffect(() => {
-    // Check authentication on page load/refresh
-    const checkAuth = async () => {
-      try {
-        // If Keycloak is available and ready, use it
-        if (
-          keycloakContext &&
-          keycloakContext.isKeycloakReady &&
-          !keycloakContext.isLoading &&
-          keycloakContext.isAuthenticated
-        ) {
+      if (
+        keycloakContext &&
+        keycloakContext.isKeycloakReady &&
+        !keycloakContext.isLoading &&
+        keycloakContext.isAuthenticated
+      ) {
+        setIsAuthenticated(true);
+        setUser(keycloakContext.user);
+        setIsLoading(false);
+        return;
+      }
+
+      if (localStorage.getItem("isAuthenticated") === "true") {
+        const userData = JSON.parse(localStorage.getItem("userData"));
+        if (userData) {
           setIsAuthenticated(true);
-          setUser(keycloakContext.user);
-          setIsLoading(false);
-          return;
-        }
-
-        // Fallback to traditional authentication
-        if (localStorage.getItem("isAuthenticated") === "true") {
-          const userData = JSON.parse(localStorage.getItem("userData"));
-          if (userData) {
-            setIsAuthenticated(true);
-            setUser(userData);
-          } else {
-            // Try to get user info from server
-            try {
-              const userInfo = await authService.getUserInfo();
-              setIsAuthenticated(true);
-              setUser(userInfo);
-            } catch (error) {
-              console.error('Failed to get user info:', error);
-              setIsAuthenticated(false);
-              setUser(null);
-              // Clear invalid tokens
-              await authService.logout();
-            }
-          }
+          setUser(userData);
         } else {
-          setIsAuthenticated(false);
-          setUser(null);
+          try {
+            const userInfo = await authService.getUserInfo();
+            setIsAuthenticated(true);
+            setUser(userInfo);
+          } catch (error) {
+            console.error('Failed to get user info:', error);
+            setIsAuthenticated(false);
+            setUser(null);
+            await authService.logout();
+          }
         }
-      } catch (error) {
-        console.error('Error checking authentication:', error);
+      } else {
         setIsAuthenticated(false);
         setUser(null);
-      } finally {
-        setIsLoading(false);
       }
-    };
+    } catch (error) {
+      console.error('Error checking authentication:', error);
+      setIsAuthenticated(false);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    checkAuth();
-  }, [keycloakContext]);
+  checkAuth();
+}, [keycloakContext?.isLoading, keycloakContext?.isAuthenticated]);
 
   // Login function using Keycloak (with dummy credentials fallback for testing)
   const login = async (username, password) => {
