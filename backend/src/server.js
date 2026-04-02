@@ -25,12 +25,16 @@ const app = express();
 
 // Configure CORS properly for credentials
 const corsOptions = {
-  origin: 'http://localhost:3000', // Specific origin instead of wildcard
-  credentials: true, // Allow credentials
+  origin: [
+    'http://localhost:3000',
+    'https://construction-management-system-cms-1.onrender.com'
+  ],
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  optionsSuccessStatus: 200 // For legacy browser support
-};
+  optionsSuccessStatus: 200
+};// For legacy browser support
+
 
 // Middleware
 app.use(cors(corsOptions));
