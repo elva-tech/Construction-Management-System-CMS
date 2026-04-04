@@ -214,7 +214,7 @@ const ViewDrawingModal = ({ isOpen, onClose, drawing, onStatusChange }) => {
   // Detect file type from local file OR from S3 URL extension
   const isPDF = hasLocalFile
     ? drawing.file.type === "application/pdf"
-    : hasS3Url && drawing.file_url.toLowerCase().includes('.pdf');
+    : hasS3Url && drawing.file_url.startsWith('data:application/pdf') ;
 
   const isImage = hasLocalFile
     ? drawing.file.type.startsWith("image/")
@@ -684,13 +684,13 @@ const Billing = () => {
                     ) : drawing.file_url ? (
                       // S3 file from DB
                       <div className="flex items-center">
-                        {drawing.file_url.toLowerCase().includes('.pdf') ? (
+                        {drawing.file_url.startsWith('data:application/pdf') ? (
                           <FileText size={16} className="text-red-500 mr-1" />
                         ) : (
                           <Image size={16} className="text-blue-500 mr-1" />
                         )}
                         <span className="text-xs">
-                          {drawing.file_url.toLowerCase().includes('.pdf') ? "PDF" : "Image"}
+                          {drawing.file_url.startsWith('data:application/pdf') ? "PDF" : "Image"}
                         </span>
                       </div>
                     ) : (
