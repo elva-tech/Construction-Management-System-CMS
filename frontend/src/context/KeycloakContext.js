@@ -1,19 +1,165 @@
+// import React, { createContext, useContext, useState, useEffect } from 'react';
+// import keycloak, { keycloakInitOptions, keycloakHelpers } from '../config/keycloak';
+
+// const KeycloakContext = createContext();
+
+// export const useKeycloak = () => useContext(KeycloakContext);
+
+// let keycloakInitialized = false;
+
+// export const KeycloakProvider = ({ children }) => {
+//   const [isKeycloakReady, setIsKeycloakReady] = useState(false);
+//   const [isAuthenticated, setIsAuthenticated] = useState(false);
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [user, setUser] = useState(null);
+//   const [keycloakError, setKeycloakError] = useState(null);
+
+//   useEffect(() => {
+//     const initKeycloak = async () => {
+//       try {
+//         const useKeycloak = process.env.REACT_APP_USE_KEYCLOAK === 'true';
+
+//         if (!useKeycloak) {
+//           setIsKeycloakReady(false);
+//           setIsLoading(false);
+//           return;
+//         }
+
+//         if (keycloakInitialized) {
+//           setIsKeycloakReady(true);
+//           setIsAuthenticated(keycloak.authenticated || false);
+//           if (keycloak.authenticated) {
+//             setUser(keycloakHelpers.getUserInfo());
+//             setupTokenRefresh();
+//           }
+//           setIsLoading(false);
+//           return;
+//         }
+
+//         keycloakInitialized = true;
+        
+        
+
+// keycloak.onAuthSuccess = () => {
+//   console.log('Keycloak auth success!');
+//   setIsAuthenticated(true);
+//   setUser(keycloakHelpers.getUserInfo());
+// };
+
+// keycloak.onAuthError = () => {
+//   console.log('Keycloak auth error!');
+//   setIsAuthenticated(false);
+// };
+
+// keycloak.onTokenExpired = () => {
+//   keycloak.updateToken(30).catch(() => handleLogout());
+// };
+// const authenticated = await keycloak.init(keycloakInitOptions);
+// console.log('authenticated:', authenticated);
+// console.log('keycloak.authenticated:', keycloak.authenticated);
+// console.log('keycloak.token:', keycloak.token ? 'EXISTS' : 'NULL');
+
+// // Force check after init
+// const isAuth = authenticated || keycloak.authenticated || false;
+// setIsKeycloakReady(true);
+// setIsAuthenticated(isAuth);
+
+// if (isAuth) {
+//   const userInfo = keycloakHelpers.getUserInfo();
+//   setUser(userInfo);
+//   setupTokenRefresh();
+// }
+//         setIsKeycloakReady(true);
+//         setIsAuthenticated(authenticated);
+
+//         if (authenticated) {
+//           const userInfo = keycloakHelpers.getUserInfo();
+//           setUser(userInfo);
+//           setupTokenRefresh();
+//         }
+
+//       } catch (error) {
+//         console.error('Keycloak initialization failed:', error);
+//         setKeycloakError(error.message || 'Failed to initialize Keycloak');
+//         keycloakInitialized = false;
+//         setIsKeycloakReady(false);
+//       } finally {
+//         setIsLoading(false);
+//       }
+//     };
+
+//     initKeycloak();
+//   }, []);
+
+//   const setupTokenRefresh = () => {
+//     setInterval(() => {
+//       if (keycloak.authenticated) {
+//         keycloak.updateToken(30).catch(() => handleLogout());
+//       }
+//     }, 30000);
+//   };
+
+//   const handleLogin = async (options = {}) => {
+//     try {
+//       if (isKeycloakReady) {
+//         await keycloakHelpers.login(options);
+//       } else {
+//         throw new Error('Keycloak not ready');
+//       }
+//     } catch (error) {
+//       console.error('Login failed:', error);
+//       throw error;
+//     }
+//   };
+
+//   const handleLogout = async (options = {}) => {
+//     try {
+//       if (isKeycloakReady && keycloak.authenticated) {
+//         await keycloakHelpers.logout(options);
+//       } else {
+//         setIsAuthenticated(false);
+//         setUser(null);
+//       }
+//     } catch (error) {
+//       setIsAuthenticated(false);
+//       setUser(null);
+//     }
+//   };
+
+//   const contextValue = {
+//     isKeycloakReady,
+//     isAuthenticated,
+//     isLoading,
+//     user,
+//     keycloakError,
+//     keycloak: isKeycloakReady ? keycloak : null,
+//     login: handleLogin,
+//     logout: handleLogout,
+//     openAccountManagement: () => isKeycloakReady && keycloakHelpers.accountManagement(),
+//     hasRole: (role) => isKeycloakReady && isAuthenticated ? keycloakHelpers.hasRole(role) : false,
+//     hasAnyRole: (roles) => isKeycloakReady && isAuthenticated ? keycloakHelpers.hasAnyRole(roles) : false,
+//     getUserPermissions: () => isKeycloakReady && isAuthenticated ? keycloakHelpers.getUserPermissions() : {},
+//     getToken: () => isKeycloakReady ? keycloakHelpers.getToken() : null,
+//     keycloakHelpers: isKeycloakReady ? keycloakHelpers : null,
+//   };
+
+//   return (
+//     <KeycloakContext.Provider value={contextValue}>
+//       {children}
+//     </KeycloakContext.Provider>
+//   );
+// };
+
+
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import keycloak, { keycloakInitOptions, keycloakHelpers } from '../config/keycloak';
 
-// Create Keycloak context
 const KeycloakContext = createContext();
+export const useKeycloak = () => useContext(KeycloakContext);
 
-// Custom hook to use Keycloak context
-// Custom hook to use Keycloak context
-export const useKeycloak = () => {
-  const context = useContext(KeycloakContext);
-  // Remove the "throw Error" block to allow fallback authentication 
-  // when KeycloakProvider is conditionally not rendered.
-  return context;
-};
+let keycloakInitialized = false;
 
-// Keycloak Provider Component
 export const KeycloakProvider = ({ children }) => {
   const [isKeycloakReady, setIsKeycloakReady] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -21,47 +167,77 @@ export const KeycloakProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [keycloakError, setKeycloakError] = useState(null);
 
-  // Initialize Keycloak
   useEffect(() => {
     const initKeycloak = async () => {
       try {
-        // Check if Keycloak should be used
-        const useKeycloak = process.env.REACT_APP_USE_KEYCLOAK === 'true';
-
-        if (!useKeycloak) {
-          console.log('Keycloak disabled via environment variable');
+        const useKc = process.env.REACT_APP_USE_KEYCLOAK === 'true';
+        if (!useKc) {
           setIsKeycloakReady(false);
           setIsLoading(false);
           return;
         }
 
-        console.log('Initializing Keycloak...');
+        if (keycloakInitialized) {
+          setIsKeycloakReady(true);
+          setIsAuthenticated(keycloak.authenticated || false);
+          if (keycloak.authenticated) {
+            const userInfo = {
+  username: keycloak.tokenParsed?.preferred_username,
+  roles: keycloak.tokenParsed?.realm_access?.roles || []
+};
 
-        // Initialize Keycloak
+setUser(userInfo);
+          }
+          setIsLoading(false);
+          return;
+        }
+
+        keycloakInitialized = true;
+
+        keycloak.onAuthSuccess = () => {
+          console.log('onAuthSuccess fired');
+          setIsAuthenticated(true);
+          const userInfo = {
+  username: keycloak.tokenParsed?.preferred_username,
+  roles: keycloak.tokenParsed?.realm_access?.roles || []
+};
+
+setUser(userInfo);
+        };
+
+        keycloak.onAuthError = () => {
+          console.log('onAuthError fired');
+          setIsAuthenticated(false);
+        };
+
+        keycloak.onTokenExpired = () => {
+          keycloak.updateToken(30).catch(() => handleLogout());
+        };
+
         const authenticated = await keycloak.init(keycloakInitOptions);
-        
-        console.log('Keycloak initialized. Authenticated:', authenticated);
-        
+        console.log('Keycloak init authenticated:', authenticated);
+        console.log('keycloak.authenticated:', keycloak.authenticated);
+        console.log('keycloak.token:', keycloak.token ? 'EXISTS' : 'NULL');
+
+        const isAuth = authenticated || keycloak.authenticated || false;
         setIsKeycloakReady(true);
-        setIsAuthenticated(authenticated);
-        
-        if (authenticated) {
-          const userInfo = keycloakHelpers.getUserInfo();
-          setUser(userInfo);
-          console.log('User info:', userInfo);
-          
-          // Set up token refresh
+        setIsAuthenticated(isAuth);
+
+        if (isAuth) {
+          const userInfo = {
+  username: keycloak.tokenParsed?.preferred_username,
+  roles: keycloak.tokenParsed?.realm_access?.roles || []
+};
+
+setUser(userInfo);
           setupTokenRefresh();
         }
-        
+
       } catch (error) {
         console.error('Keycloak initialization failed:', error);
-        setKeycloakError(error.message || 'Failed to initialize Keycloak');
-        
-        // Fallback to mock authentication for development
-        console.log('Falling back to mock authentication...');
+        setKeycloakError(error.message);
+        keycloakInitialized = false;
         setIsKeycloakReady(false);
-        
       } finally {
         setIsLoading(false);
       }
@@ -70,117 +246,50 @@ export const KeycloakProvider = ({ children }) => {
     initKeycloak();
   }, []);
 
-  // Setup automatic token refresh
   const setupTokenRefresh = () => {
-    // Refresh token every 30 seconds if it's about to expire
     setInterval(() => {
       if (keycloak.authenticated) {
-        keycloak.updateToken(30)
-          .then((refreshed) => {
-            if (refreshed) {
-              console.log('Token refreshed');
-            }
-          })
-          .catch((error) => {
-            console.error('Failed to refresh token:', error);
-            // Force logout if token refresh fails
-            handleLogout();
-          });
+        keycloak.updateToken(30).catch(() => handleLogout());
       }
-    }, 30000); // Check every 30 seconds
+    }, 30000);
   };
 
-  // Login function
   const handleLogin = async (options = {}) => {
-    try {
-      if (isKeycloakReady) {
-        await keycloakHelpers.login(options);
-      } else {
-        throw new Error('Keycloak not ready');
-      }
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
+    if (isKeycloakReady) {
+      await keycloakHelpers.login(options);
+    } else {
+      throw new Error('Keycloak not ready');
     }
   };
 
-  // Logout function
   const handleLogout = async (options = {}) => {
     try {
       if (isKeycloakReady && keycloak.authenticated) {
         await keycloakHelpers.logout(options);
       } else {
-        // Clear local state
         setIsAuthenticated(false);
         setUser(null);
       }
     } catch (error) {
-      console.error('Logout failed:', error);
-      // Clear local state anyway
       setIsAuthenticated(false);
       setUser(null);
     }
   };
 
-  // Account management
-  const openAccountManagement = () => {
-    if (isKeycloakReady) {
-      keycloakHelpers.accountManagement();
-    }
-  };
-
-  // Check if user has specific role
-  const hasRole = (role) => {
-    if (!isKeycloakReady || !isAuthenticated) return false;
-    return keycloakHelpers.hasRole(role);
-  };
-
-  // Check if user has any of the specified roles
-  const hasAnyRole = (roles) => {
-    if (!isKeycloakReady || !isAuthenticated) return false;
-    return keycloakHelpers.hasAnyRole(roles);
-  };
-
-  // Get user permissions
-  const getUserPermissions = () => {
-    if (!isKeycloakReady || !isAuthenticated) return {};
-    return keycloakHelpers.getUserPermissions();
-  };
-
-  // Get access token
-  const getToken = () => {
-    if (!isKeycloakReady) return null;
-    return keycloakHelpers.getToken();
-  };
-
-  // Context value
   const contextValue = {
-    // Keycloak state
     isKeycloakReady,
     isAuthenticated,
     isLoading,
     user,
     keycloakError,
-    
-    // Keycloak instance (for advanced usage)
     keycloak: isKeycloakReady ? keycloak : null,
-    
-    // Authentication methods
     login: handleLogin,
     logout: handleLogout,
-    
-    // User management
-    openAccountManagement,
-    
-    // Authorization methods
-    hasRole,
-    hasAnyRole,
-    getUserPermissions,
-    
-    // Token methods
-    getToken,
-    
-    // Helpers
+    openAccountManagement: () => isKeycloakReady && keycloakHelpers.accountManagement(),
+    hasRole: (role) => isKeycloakReady && isAuthenticated ? keycloakHelpers.hasRole(role) : false,
+    hasAnyRole: (roles) => isKeycloakReady && isAuthenticated ? keycloakHelpers.hasAnyRole(roles) : false,
+    getUserPermissions: () => isKeycloakReady && isAuthenticated ? keycloakHelpers.getUserPermissions() : {},
+    getToken: () => isKeycloakReady ? keycloakHelpers.getToken() : null,
     keycloakHelpers: isKeycloakReady ? keycloakHelpers : null,
   };
 

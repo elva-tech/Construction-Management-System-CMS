@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ElvaLogo from '../Components/ElvaLogo';
@@ -13,25 +13,16 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  console.log('Form submitted!');
 
-    try {
-      const result = await login(username, password);
-      if (result.success) {
-        navigate('/app/projects');
-      } else {
-        setError(result.error || 'Login failed');
-      }
-    } catch (error) {
-      setError(error.message || 'An unexpected error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  try {
+    await login(); // 🔥 ONLY THIS
+  } catch (error) {
+    setError('Login failed');
+  }
+};
   return (
     <div className="min-h-screen bg-[#1e2c3d] px-4 flex flex-col">
       {/* Logo at the very top center */}

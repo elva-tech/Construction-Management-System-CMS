@@ -7,6 +7,9 @@ import { useToast } from '../context/ToastContext';
 import { useProject } from '../context/ProjectContext';
 import drawingService from '../services/drawingService';
 
+import { useAuth } from "../context/AuthContext";
+
+
 const statusClasses = {
   Approved: "text-green-600 border border-green-500 px-2 py-0.5 rounded-full text-xs",
   Rejected: "text-red-600 border border-red-500 px-2 py-0.5 rounded-full text-xs",
@@ -202,6 +205,8 @@ const UploadDrawingModal = ({ isOpen, onClose, onUpload, selectedDrawing, onResu
 // 1. Local file (File object) — newly uploaded in this session
 // 2. S3 URL (file_url string) — previously uploaded and stored in S3
 const ViewDrawingModal = ({ isOpen, onClose, drawing, onStatusChange }) => {
+  const { user } = useAuth();
+const isSupervisor = user?.roles?.includes("supervisor");
   const [isProcessing, setIsProcessing] = useState(false);
   const { showToast } = useToast();
 
@@ -417,7 +422,7 @@ const ViewDrawingModal = ({ isOpen, onClose, drawing, onStatusChange }) => {
         </div>
 
         <div className="mt-4 flex justify-end space-x-3">
-          {showActionButtons() && (hasLocalFile || hasS3Url) && (
+          {!isSupervisor && showActionButtons() && (hasLocalFile || hasS3Url) && (
             <>
               <button
                 onClick={handleReject}

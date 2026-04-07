@@ -5,6 +5,8 @@ import { useProject } from "../context/ProjectContext";
 import { useAppContext } from "../context/AppContext";
 import materialService from "../services/materialService";
 import materialTrackingService from "../services/materialTrackingService";
+import { useAuth } from "../context/AuthContext";
+
 import {
   ChartColumnBig,
   Wallet,
@@ -40,6 +42,12 @@ const Dashboard = () => {
   const { projectId } = useParams();
   const { selectedProject, isLoading, selectProject } = useProject();
   const { appData } = useAppContext();
+
+
+  const { user } = useAuth();
+
+const isClient = user?.roles?.includes("client");
+const isSupervisor = user?.roles?.includes("supervisor");
 
   // PRODUCTION: real material tracking entries from API
   const [materialEntries, setMaterialEntries] = useState([]);
@@ -325,6 +333,8 @@ const Dashboard = () => {
       <Navbar currentPath={location.pathname} icon={ChartColumnBig} />
 
       {/* Project Header */}
+      
+      {!isClient && !isSupervisor && (
       <div className="px-4 py-4 bg-white border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
           {selectedProject && (
@@ -337,6 +347,7 @@ const Dashboard = () => {
             </button>
           )}
         </div>
+      
 
         {/* Project Info */}
         {selectedProject && (
@@ -382,10 +393,12 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* Main Dashboard Content */}
       <div className="p-4 space-y-6">
         {/* Financial Overview Cards */}
+        {!isClient  && !isSupervisor && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Total Amount Card */}
           <div className="bg-white border-2 border-[#7BAFD4] rounded-lg p-4 shadow-md relative overflow-hidden">
@@ -455,10 +468,14 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+        )}
 
         {/* Analytics Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+           <div className={`grid gap-6 ${
+  isClient ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1 lg:grid-cols-3"
+}`}>
           {/* Payment Progress */}
+          {!isSupervisor && (
           <div className="bg-[#7BAFD4] rounded-lg p-6 shadow-md text-white">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Payment Progress</h3>
@@ -470,7 +487,7 @@ const Dashboard = () => {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span>Total Amount:</span>
-                <span className="font-medium">{formatINR(projectStats.financial.totalAmount)}</span>
+                <span className="font-medium">{isSupervisor ? "—" : formatINR(projectStats.financial.totalAmount)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Amount Paid:</span>
@@ -482,8 +499,10 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+          )}
 
           {/* Material Overview */}
+          {!isClient && (
           <div className="bg-[#7BAFD4] rounded-lg p-6 shadow-md text-white">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Material Overview</h3>
@@ -524,8 +543,10 @@ const Dashboard = () => {
               })}
             </div>
           </div>
+          )}
 
           {/* Recent Transactions */}
+          {!isClient  && !isSupervisor && (
           <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Recent Transactions</h3>
@@ -546,11 +567,14 @@ const Dashboard = () => {
               ))}
             </div>
           </div>
+            )}
+
         </div>
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Financial Trends Chart */}
+           {!isSupervisor && (
           <div className="bg-[#7BAFD4] rounded-lg p-6 shadow-md text-white">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Financial Trends</h3>
@@ -568,8 +592,10 @@ const Dashboard = () => {
             </div>
             {renderFinancialChart()}
           </div>
+           )}
 
           {/* Material Usage Chart */}
+          {!isClient && (
           <div className="bg-[#7BAFD4] rounded-lg p-6 shadow-md text-white">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Material Usage</h3>
@@ -587,6 +613,7 @@ const Dashboard = () => {
             </div>
             {renderMaterialChart()}
           </div>
+          )}
         </div>
 
         {/* Project Insights */}
@@ -629,7 +656,7 @@ const Dashboard = () => {
               <div className="text-xs text-gray-500 mt-1">Financial & Material</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-orange-600 mb-2">{formatINR(projectStats.financial.existingBalance)}</div>
+              <div className="text-3xl font-bold text-orange-600 mb-2">{isSupervisor ? "—" : formatINR(projectStats.financial.existingBalance)}</div>
               <div className="text-sm text-gray-600">Existing Balance</div>
               <div className="text-xs text-gray-500 mt-1">Available funds</div>
             </div>

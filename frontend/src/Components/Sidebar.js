@@ -44,9 +44,9 @@ export default function Sidebar() {
 
     // Check both the original path and project-specific path
     return location.pathname === routePath ||
-           location.pathname === projectSpecificPath ||
-           location.pathname.startsWith(routePath + '/') ||
-           location.pathname.startsWith(projectSpecificPath + '/');
+      location.pathname === projectSpecificPath ||
+      location.pathname.startsWith(routePath + '/') ||
+      location.pathname.startsWith(projectSpecificPath + '/');
   };
 
   // Handle navigation with project-specific routes
@@ -66,20 +66,25 @@ export default function Sidebar() {
       </div>
       <nav className="flex-1 overflow-y-auto">
         <ul className="space-y-1">
-          {sidebarroutes.map((route, index) => (
-            <li key={index}>
-              <div
-                className={`flex items-center gap-2 p-2 rounded-xl cursor-pointer text-md transition-all duration-200
+          {sidebarroutes
+            .filter((route) => {
+              if (!route.roles) return true;
+              return route.roles.some(role => user?.roles?.includes(role));
+            })
+            .map((route, index) => (
+              <li key={index}>
+                <div
+                  className={`flex items-center gap-2 p-2 rounded-xl cursor-pointer text-md transition-all duration-200
                   ${isActive(route.path)
-                    ? 'bg-white text-[#669BBC] font-semibold shadow-sm'
-                    : 'text-black hover:bg-white/90 hover:text-[#669BBC]'
-                  }`}
-                onClick={() => handleNavigation(route.path)}
-              >
-                {route.icon} {route.name}
-              </div>
-            </li>
-          ))}
+                      ? 'bg-white text-[#669BBC] font-semibold shadow-sm'
+                      : 'text-black hover:bg-white/90 hover:text-[#669BBC]'
+                    }`}
+                  onClick={() => handleNavigation(route.path)}
+                >
+                  {route.icon} {route.name}
+                </div>
+              </li>
+            ))}
         </ul>
       </nav>
 

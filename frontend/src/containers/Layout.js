@@ -7,9 +7,37 @@ import Page404 from "../Pages/Page404";
 import PageTransition from "../Components/common/PageTransition";
 import { AnimatePresence } from "framer-motion";
 
+import { useAuth } from "../context/AuthContext";
+
+const RoleBasedRedirect = () => {
+  const { user } = useAuth();
+
+  if (!user) return null;
+
+  if (user.roles.includes("admin")) {
+    return <Navigate to="/app/dashboard" replace />;
+  }
+
+  if (user.roles.includes("supervisor")) {
+    return <Navigate to="/app/dashboard" replace />;
+  }
+
+ if (user.roles.includes("client")) {
+  return <Navigate to="/app/dashboard" replace />;
+}
+
+  return <Navigate to="/app/projects" replace />;
+};
+
 const Layout = () => {
   const location = useLocation();
+  const { user } = useAuth();
   const isProjectsPage = location.pathname === "/app/projects";
+
+  if (location.pathname === "/app/projects" && user?.roles?.includes("client")) {
+  return <Navigate to="/app/clientpayments" replace />;
+}
+
 
   return React.createElement(
     'div',
@@ -37,15 +65,20 @@ const Layout = () => {
               { location: location },
               React.createElement(Route, {
                 path: "/",
-                element: React.createElement(Navigate, { to: "/app/projects", replace: true })
+                element: React.createElement(RoleBasedRedirect, null)
               }),
-              pageroutes.map((route, index) =>
-                React.createElement(Route, {
-                  key: index,
-                  path: route.path.replace('/app/', ''),
-                  element: React.createElement(route.component)
+              pageroutes
+                .filter((route) => {
+                  if (!route.roles) return true;
+                  return route.roles.some(role => user?.roles?.includes(role));
                 })
-              ),
+                .map((route, index) =>
+                  React.createElement(Route, {
+                    key: index,
+                    path: route.path.replace('/app/', ''),
+                    element: React.createElement(route.component)
+                  })
+                ),
               React.createElement(Route, {
                 path: "*",
                 element: React.createElement(Page404)
