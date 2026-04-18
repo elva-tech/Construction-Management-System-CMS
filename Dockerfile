@@ -1,6 +1,7 @@
 FROM quay.io/keycloak/keycloak:23.0.0
 
-ENV KEYCLOAK_ADMIN=admin
-ENV KEYCLOAK_ADMIN_PASSWORD=admin123
+ENV KC_BOOTSTRAP_ADMIN_USERNAME=admin
+ENV KC_BOOTSTRAP_ADMIN_PASSWORD=admin123
 
-CMD ["start", "--http-enabled=true", "--hostname-strict=false", "--hostname=0.0.0.0", "--http-port=10000"]
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
+CMD ["start", "--http-port=8080", "--hostname-strict=false"]
