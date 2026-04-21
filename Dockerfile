@@ -11,6 +11,8 @@ ENV KC_DB_PASSWORD=WQiLBB4Idsd8y4CpBRnctnPyWOBM9OEl
 ENV KC_CACHE=local
 ENV KC_HTTP_ENABLED=true
 ENV KC_HOSTNAME_STRICT=false
+ENV KC_CACHE_STACK=local
+ENV KC_PROXY=edge
 
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
 CMD ["start", "--http-port=8080", "--hostname-strict=false"]
