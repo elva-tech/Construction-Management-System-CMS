@@ -18,4 +18,4 @@ ENV KC_DB_URL_PROPERTIES="sslmode=require"
 ENTRYPOINT []
 #CMD ["start", "--http-port=8080", "--hostname-strict=false","--spi-initialization-admin-create=true"]
 #CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start-dev --http-port=${PORT}"]
-CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start-dev --http-enabled=true --http-host=0.0.0.0 --http-port=${PORT}"]
+CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start --http-enabled=true --http-host=0.0.0.0 --http-port=${PORT}"]
