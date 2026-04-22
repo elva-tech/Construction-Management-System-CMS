@@ -12,9 +12,10 @@ ENV KC_CACHE=local
 ENV KC_HTTP_ENABLED=true
 ENV KC_HOSTNAME_STRICT=false
 ENV KC_PROXY=edge
-ENV KC_HTTP_PORT=8080
+#ENV KC_HTTP_PORT=8080
 ENV KC_DB_URL_PROPERTIES="sslmode=require"
 
 #ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
 #CMD ["start", "--http-port=8080", "--hostname-strict=false","--spi-initialization-admin-create=true"]
-CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start-dev --http-port=${PORT}"]
+#CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start-dev --http-port=${PORT}"]
+CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start-dev --http-enabled=true --hostname-strict=false --http-host=0.0.0.0 --http-port=${PORT}"]
