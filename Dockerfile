@@ -6,7 +6,7 @@ ENV KC_BOOTSTRAP_ADMIN_PASSWORD=admin123
 #Database configuration
 ENV KC_DB=postgres
 ENV KC_DB_URL=jdbc:postgresql://dpg-d7k8ssd7vvec7396fpg0-a.virginia-postgres.render.com:5432/keycloak_elva_db?sslmode=require&ssl=true
-ENV KC_DB_USERNAME=keycloak_elva_db_user
+ENV KC_DB_USERNAME=keycloak_elva_db_use
 ENV KC_DB_PASSWORD=L5g2nskAJTlDyQ3mZ2HlCYHoMrxdIy5w
 ENV KC_CACHE=local
 ENV KC_HTTP_ENABLED=true
