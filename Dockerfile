@@ -5,7 +5,7 @@ ENV KC_BOOTSTRAP_ADMIN_PASSWORD=admin123
 
 #Database configuration
 ENV KC_DB=mysql
-ENV KC_DB_URL=jdbc:mysql://92.4.91.87:3306/keycloack_elva_db?useSSL=true&requireSSL=true
+ENV KC_DB_URL=jdbc:mysql://92.4.91.87:3306/keycloack_elva_db?useSSL=false
 ENV KC_DB_USERNAME=elvatech
 ENV KC_DB_PASSWORD=root123
 ENV KC_CACHE=local
