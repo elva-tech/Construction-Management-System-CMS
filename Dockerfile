@@ -5,7 +5,10 @@ ENV KC_BOOTSTRAP_ADMIN_PASSWORD=admin123
 
 #Database configuration
 ENV KC_DB=mysql
-ENV KC_DB_URL=jdbc:mysql://92.4.91.87:3306/keycloack_elva_db?useSSL=false&allowPublicKeyRetrieval=true
+#ENV KC_DB_URL=jdbc:mysql://92.4.91.87:3306/keycloack_elva_db?useSSL=false&allowPublicKeyRetrieval=true
+ENV KC_DB_URL_HOST=92.4.91.87
+ENV KC_DB_URL_PORT=3306
+ENV KC_DB_URL_DATABASE=keycloack_elva_db
 ENV KC_DB_USERNAME=elvatech
 ENV KC_DB_PASSWORD=root123
 ENV KC_CACHE=local
@@ -18,4 +21,6 @@ ENV KC_HOSTNAME_STRICT=false
 ENTRYPOINT []
 #CMD ["start", "--http-port=8080", "--hostname-strict=false","--spi-initialization-admin-create=true"]
 #CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start-dev --http-port=${PORT}"]
-CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start --http-enabled=true --http-host=0.0.0.0 --http-port=${PORT}"]
+RUN /opt/keycloak/bin/kc.sh build
+#CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start --http-enabled=true --http-host=0.0.0.0 --http-port=${PORT}"]
+CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start-dev --http-port=${PORT}"]
