@@ -26,4 +26,6 @@ ENTRYPOINT []
 #RUN /opt/keycloak/bin/kc.sh build
 #CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start --http-enabled=true --http-host=0.0.0.0 --http-port=${PORT}"]
 #CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start-dev --http-port=${PORT}"]
-CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start-dev --http-enabled=true --hostname-strict=false --http-port=${PORT}"]
+RUN /opt/keycloak/bin/kc.sh build
+#CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start-dev --http-enabled=true --hostname-strict=false --http-port=${PORT}"]
+CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start --http-enabled=true --hostname-strict=false --http-port=${PORT}"]
