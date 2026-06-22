@@ -11,9 +11,9 @@ ENV KC_DB_PASSWORD=root123
 ENV KC_CACHE=local
 ENV KC_HTTP_ENABLED=true
 ENV KC_HOSTNAME_STRICT=false
-ENV KC_PROXY=edge
+#ENV KC_PROXY=edge
 #ENV KC_HTTP_PORT=8080
-ENV KC_DB_URL_PROPERTIES="sslmode=require"
+#ENV KC_DB_URL_PROPERTIES="sslmode=require"
 
 ENTRYPOINT []
 #CMD ["start", "--http-port=8080", "--hostname-strict=false","--spi-initialization-admin-create=true"]
