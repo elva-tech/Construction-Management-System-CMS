@@ -2,8 +2,8 @@ FROM quay.io/keycloak/keycloak:23.0.0
 
 #ENV KC_BOOTSTRAP_ADMIN_USERNAME=admin
 #ENV KC_BOOTSTRAP_ADMIN_PASSWORD=admin123
-ENV KEYCLOAK_ADMIN=admin
-ENV KEYCLOAK_ADMIN_PASSWORD=admin123
+#ENV KEYCLOAK_ADMIN=admin
+#ENV KEYCLOAK_ADMIN_PASSWORD=admin123
 
 #Database configuration
 ENV KC_DB=mysql
@@ -23,6 +23,7 @@ ENV KC_HOSTNAME_STRICT=false
 ENTRYPOINT []
 #CMD ["start", "--http-port=8080", "--hostname-strict=false","--spi-initialization-admin-create=true"]
 #CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start-dev --http-port=${PORT}"]
-RUN /opt/keycloak/bin/kc.sh build
+#RUN /opt/keycloak/bin/kc.sh build
 #CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start --http-enabled=true --http-host=0.0.0.0 --http-port=${PORT}"]
-CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start-dev --http-port=${PORT}"]
+#CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start-dev --http-port=${PORT}"]
+CMD ["sh", "-c", "/opt/keycloak/bin/kc.sh start-dev --http-enabled=true --hostname-strict=false --http-port=${PORT}"]
